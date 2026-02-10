@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_leave_type_form_policy" model="ir.ui.view">
+        <field name="name">hr.leave.type.form.policy</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Add fields in a simple group after existing content -->
+            <xpath expr="//form/sheet/group" position="after">
+                
+                <separator string="Company Policy Settings" colspan="4"/>
+                
+                <!-- Category 1: Date Restrictions -->
+                <group string="Date Restrictions" name="date_restrictions">
+                    <group>
+                        <field name="allow_future_request"/>
+                        <field name="max_backdate_days"/>
+                    </group>
+                    <group>
+                        <label for="allow_future_request" string="Info"/>
+                        <div class="text-muted">
+                            <p><strong>Allow Future:</strong> If disabled, employees cannot request future dates</p>
+                            <p><strong>Max Backdate:</strong> Maximum days in the past (0 = no backdate allowed)</p>
+                        </div>
+                    </group>
+                </group>
+                
+                <!-- Category 2: Minimum Notice Requirement -->
+                <group string="Minimum Notice Requirement" name="min_notice" invisible="1 == 0">
+                    <group>
+                        <field name="enable_min_notice"/>
+                        <field name="threshold_days" invisible="not enable_min_notice"/>
+                        <field name="use_business_days_for_threshold" invisible="not enable_min_notice"/>
+                    </group>
+                    <group>
+                        <field name="min_notice_qty" invisible="not enable_min_notice"/>
+                        <field name="min_notice_unit" invisible="not enable_min_notice"/>
+                        <field name="exclude_public_holidays" invisible="not enable_min_notice or min_notice_unit != 'business_days'"/>
+                    </group>
+                    <group invisible="not enable_min_notice">
+                        <field name="scope_mode"/>
+                        <field name="department_id" invisible="scope_mode != 'department'"/>
+                        <field name="category_id" invisible="scope_mode != 'category'"/>
+                    </group>
+                    <group invisible="not enable_min_notice">
+                        <field name="exempt_group_ids" widget="many2many_tags"/>
+                        <field name="grace_hours"/>
+                        <field name="valid_from"/>
+                        <field name="valid_to"/>
+                    </group>
+                </group>
+                
+                <!-- Category 3: Working Days Limitation -->
+                <group string="Batasan Hari Kerja Cuti" name="working_days_limit">
+                    <group>
+                        <field name="limit_by_working_days"/>
+                        <field name="max_working_days" invisible="not limit_by_working_days"/>
+                    </group>
+                    <group>
+                        <label for="limit_by_working_days" string="Info"/>
+                        <div class="text-muted" invisible="not limit_by_working_days">
+                            <p><strong>Maksimal Hari Kerja untuk Cuti</strong></p>
+                            <p>Contoh: Jika diset 10, karyawan hanya boleh cuti maksimal 10 hari kerja berturut-turut</p>
+                            <p>Dihitung dari work entries atau resource calendar (hari kerja, bukan hari kalender)</p>
+                        </div>
+                    </group>
+                </group>
+                
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
