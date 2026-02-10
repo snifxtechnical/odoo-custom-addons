@@ -1,28 +1,39 @@
-# odoo-custom-addons
+# Addons Directory
 
-Repository ini berisi kumpulan add-on kustom Odoo yang digunakan di lingkungan internal kami.
-Saat ini fokus pada Odoo **18.0 Community Edition** dengan struktur monorepo untuk memudahkan maintenance lintas proyek dan versi.
+Folder **addons** adalah root untuk semua add-on kustom yang digunakan bersama dengan Odoo standar.
 
-## Struktur Repository
+## Struktur Sub-Folder
 
-- `addons/`
-  - `timeoff_extension/` – Add-on untuk modul Time Off (cuti).
-  - `project_extension/` – Add-on untuk modul Project.
-  - `helpdesk_extension/` – Add-on untuk modul Helpdesk / Ticketing.
-- `scripts/` – Script bantu (deploy, backup, dll).
-- `docker-compose.yml` – (Opsional) File untuk menjalankan environment Odoo lokal.
+- `timeoff_extension/`
+  Kumpulan modul yang memperluas fitur Time Off / HR Leave.
 
-Detail masing‑masing grup add-on bisa dilihat pada README di dalam folder terkait.
+- `project_extension/`
+  Kumpulan modul yang memperluas fitur Project dan Task management.
 
-## Versi Odoo & Branch
+- `helpdesk_extension/`
+  Kumpulan modul yang memperluas fitur Helpdesk / Ticketing.
 
-- Branch `18.0` → kode untuk Odoo 18.0 CE.
-- Branch lain (misalnya `19.0`) akan dibuat ketika ada kebutuhan upgrade versi.
+Masing‑masing sub‑folder memiliki README sendiri yang menjelaskan modul di dalamnya secara lebih detail.
 
-Setiap modul mengikuti format versi `18.0.x.x.x` di file `__manifest__.py`.
+## Cara Menambahkan Modul Baru
 
-## Cara Menggunakan Repository Ini
+1. Tentukan grup yang sesuai:
+   - Modul terkait cuti → `timeoff_extension/`
+   - Modul terkait proyek → `project_extension/`
+   - Modul terkait helpdesk → `helpdesk_extension/`
+2. Buat folder baru dengan nama teknis modul, misalnya:
+   - `addons/project_extension/maxcustom_project_new_feature/`
+3. Di dalam folder modul, buat struktur standar:
+   - `__init__.py`
+   - `__manifest__.py`
+   - `models/`, `views/`, `security/`, `data/` (sesuai kebutuhan)
+4. Update README di sub‑folder (misalnya `project_extension/README.md`) untuk menambahkan deskripsi modul baru.
 
-1. Clone repository:
-   ```bash
-   git clone https://github.com/<org-atau-user>/odoo-custom-addons.git -b 18.0
+## Kompatibilitas
+
+Semua modul di dalam folder ini ditargetkan untuk:
+
+- Odoo: **18.0 Community Edition**
+- Versi modul mengikuti format `18.0.x.x.x` di `__manifest__.py`.
+
+Jika ada modul untuk versi Odoo lain, gunakan branch berbeda (misalnya `19.0`) dan jaga agar isi `addons/` di setiap branch sesuai dengan versi target.
