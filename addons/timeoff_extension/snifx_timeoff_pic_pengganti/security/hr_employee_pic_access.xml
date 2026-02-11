@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        
+        <!-- 
+            v1.11.0 - AUTOMATIC OLD RULE CLEANUP
+            
+            Problem: Old rules from v1.8.0 (IDs 233, 237) persist in database causing conflicts.
+            Solution: post_init_hook automatically deletes old rules + this clean rule.
+            
+            This rule uses smart department restrictions with graceful fallbacks:
+            
+            Domain Logic:
+            ['|',  ← OR operator for graceful fallback
+                '&',  ← Main logic: department tree
+                    ('department_id', '!=', False),
+                    '|',
+                        ('id', '=', user.employee_id.id),
+                        '|',
+                            ('department_id', 'child_of', user.employee_id.department_id.id),
+                            ('department_id', 'parent_of', user.employee_id.department_id.id),
+                ('department_id', '=', False)  ← Fallback: employees without department
+            ]
+            
+            Behavior:
+            - User with department → See department tree (privacy maintained)
+            - User without department → See all employees (prevents error)
+            - Employee without department → Visible to all (prevents exclusion)
+            
+            Security:
+            - Read-only access within department boundaries
+            - No write/create/delete permissions
+            - Appropriate for PIC selection
+            
+            Technical:
+            - noupdate="0": Forces rule reload on upgrade
+            - Unique ID: Prevents conflicts with old rules
+            - post_init_hook: Deletes conflicting old rules automatically
+        -->
+        
+        <record id="hr_employee_rule_pic_pengganti_v1_11_final" model="ir.rule">
+            <field name="name">Employee: Department Tree for PIC Pengganti (v1.11 - Auto Cleanup)</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="domain_force">['|', 
+                '&amp;', 
+                    ('department_id', '!=', False), 
+                    '|', 
+                        ('id', '=', user.employee_id.id), 
+                        '|', 
+                            ('department_id', 'child_of', user.employee_id.department_id.id), 
+                            ('department_id', 'parent_of', user.employee_id.department_id.id),
+                ('department_id', '=', False)
+            ]</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+        
+    </data>
+</odoo>

@@ -1,0 +1,75 @@
+<odoo>
+  <data>
+    <!-- 
+      v1.13.0 - hr.employee.public Solution (PERFECT FIX!)
+      
+      Key Innovation:
+      Uses hr.employee.public model instead of hr.employee for PIC selection!
+      
+      Why This Works:
+      - hr.employee.public is a PUBLIC view of employees
+      - Does NOT include current_leave_id (restricted field)
+      - Accessible to ALL Internal Users
+      - No field-level restrictions
+      - Purpose-built by Odoo for exactly this use case!
+      
+      Implementation:
+      - pic_pengganti_public_id: User selects from here (hr.employee.public)
+      - pic_pengganti_id: Stores actual reference (hr.employee) - hidden
+      - @api.onchange: Auto-syncs between the two
+      
+      Security:
+      - Field restrictions MAINTAINED (current_leave_id still protected in hr.employee)
+      - Users only interact with hr.employee.public (no restricted fields)
+      - Backend stores proper hr.employee reference
+      - ✅ Perfect balance: Security + Functionality!
+      
+      This is the SAME approach Odoo's Employees menu uses!
+    -->
+    <record id="snifx_view_hr_leave_form_add_pic" model="ir.ui.view">
+      <field name="name">snifx.hr.leave.form.add.pic.v1.13</field>
+      <field name="model">hr.leave</field>
+      <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='holiday_status_id']" position="after">
+          <!-- 
+            PIC Pengganti selection using hr.employee.public
+            
+            This field references hr.employee.public which:
+            - Is accessible to all Internal Users
+            - Doesn't have current_leave_id field
+            - Contains only public employee information
+            - NO restricted field access!
+            
+            Widget options:
+            - no_open: Prevents opening employee form
+            - no_create: Cannot create employees from here
+            - no_quick_create: No popup creation
+            
+            Context:
+            - Minimal field loading
+            - Search by name only
+            
+            Domain:
+            - Active employees only
+            - Simple filter (no complex conditions)
+          -->
+          <field name="pic_pengganti_public_id" 
+                 widget="many2one"
+                 options="{'no_open': True, 'no_create': True, 'no_quick_create': True}"
+                 placeholder="Select PIC Pengganti (Substitute)"
+                 context="{'show_name': True}"
+                 domain="[('active', '=', True)]"
+                 help="Select a substitute person in charge during your time off"/>
+          
+          <!-- 
+            Hidden field: Stores actual hr.employee reference
+            This is what the backend/email/notifications use
+            Synced automatically via @api.onchange
+          -->
+          <field name="pic_pengganti_id" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
