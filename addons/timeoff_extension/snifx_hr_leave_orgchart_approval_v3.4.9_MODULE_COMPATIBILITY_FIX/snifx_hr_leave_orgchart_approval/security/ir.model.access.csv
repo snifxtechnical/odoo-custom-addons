@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_leave_approval_level_user,Leave Approval Level User,model_leave_approval_level,base.group_user,1,1,1,0
-access_leave_approval_level_officer,Leave Approval Level Officer,model_leave_approval_level,hr_holidays.group_hr_holidays_user,1,1,1,1
-access_leave_approval_level_manager,Leave Approval Level Manager,model_leave_approval_level,hr_holidays.group_hr_holidays_manager,1,1,1,1
