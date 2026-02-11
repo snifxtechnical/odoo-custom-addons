@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================= -->
+    <!-- Officer Assignment Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can see their own assignments (read-only) -->
+    <record id="rule_assignment_officer_own" model="ir.rule">
+        <field name="name">Officer Assignment: Own assignments</field>
+        <field name="model_id" ref="model_hr_timeoff_officer_assignment"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('user_id', '=', user.id),
+            ('company_id', '=', user.company_id.id)
+        ]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- HR Managers can manage all assignments -->
+    <record id="rule_assignment_manager" model="ir.rule">
+        <field name="name">Officer Assignment: Manager all</field>
+        <field name="model_id" ref="model_hr_timeoff_officer_assignment"/>
+        <field name="groups" eval="[(4, ref('hr_holidays.group_hr_holidays_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Employee Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can see ALL employees (no department restriction) -->
+    <!-- Field-level security is handled by view groups_id -->
+    <record id="rule_emp_ob_all" model="ir.rule">
+        <field name="name">Employee: Officer view all</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('company_id', 'in', user.company_ids.ids)
+        ]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Leave Request Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can view/approve leaves for their assigned departments -->
+    <!-- EXCLUDING their own leave requests -->
+    <record id="rule_leave_ob_assigned_depts" model="ir.rule">
+        <field name="name">Leave: Officer assigned departments</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('employee_company_id', 'in', company_ids),
+            ('employee_id.user_id', '!=', user.id),
+            ('employee_id.department_id', 'child_of', user.timeoff_officer_root_dept_ids.ids)
+        ]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Allocation Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can view allocations for their assigned departments -->
+    <record id="rule_alloc_ob_assigned_depts" model="ir.rule">
+        <field name="name">Allocation: Officer assigned departments</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_allocation"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('employee_company_id', 'in', company_ids),
+            ('employee_id.department_id', 'child_of', user.timeoff_officer_root_dept_ids.ids)
+        ]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Report Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can view balance reports for their assigned departments -->
+    <record id="rule_rep_emp_type_ob_assigned" model="ir.rule">
+        <field name="name">Report emp-type: Officer assigned departments</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_employee_type_report"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', 'child_of', user.timeoff_officer_root_dept_ids.ids)
+        ]</field>
+    </record>
+    
+    <record id="rule_rep_leave_ob_assigned" model="ir.rule">
+        <field name="name">Report leave: Officer assigned departments</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave_report"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('employee_id.department_id', 'child_of', user.timeoff_officer_root_dept_ids.ids)
+        ]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Public Holidays Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can manage all public holidays -->
+    <record id="rule_public_holiday_ob" model="ir.rule">
+        <field name="name">Public Holidays: Officer full access</field>
+        <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    
+    <!-- ========================================= -->
+    <!-- Department Rules -->
+    <!-- ========================================= -->
+    
+    <!-- Officers can view all departments -->
+    <record id="rule_department_ob" model="ir.rule">
+        <field name="name">Department: Officer view all</field>
+        <field name="model_id" ref="hr.model_hr_department"/>
+        <field name="groups" eval="[(4, ref('snifx_timeoff_officer_department.group_timeoff_officer_department'))]"/>
+        <field name="domain_force">[
+            ('company_id', 'in', user.company_ids.ids)
+        ]</field>
+    </record>
+</odoo>

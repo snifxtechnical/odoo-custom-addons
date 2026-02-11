@@ -1,0 +1,1 @@
+Icon placeholder - use actual icon.png file (128x128 or 256x256)

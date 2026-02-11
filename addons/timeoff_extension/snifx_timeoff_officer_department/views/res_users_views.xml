@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Time Off (Extra) field to Access Rights tab -->
+    <record id="view_users_form_timeoff_extra_dropdown" model="ir.ui.view">
+        <field name="name">res.users.form.timeoff.extra.dropdown</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <!-- 
+            Add Time Off (Extra) at end of Access Rights page
+            Priority 999 ensures this loads AFTER all other views
+            This prevents overriding Odoo's native Time Off field
+            -->
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="HUMAN RESOURCES EXTRA">
+                    <field name="timeoff_extra_access" widget="selection"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Officer Assignments tab to User form -->
+    <record id="view_users_form_timeoff_officer" model="ir.ui.view">
+        <field name="name">res.users.form.timeoff.officer</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="priority">999</field>
+        <field name="arch" type="xml">
+            <!-- Add tab after Preferences (or at the end of notebook) -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Officer Assignments" 
+                      name="timeoff_officer_assignments"
+                      groups="hr_holidays.group_hr_holidays_manager">
+                    <group>
+                        <group>
+                            <field name="is_timeoff_officer" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <field name="timeoff_officer_assignment_ids" 
+                           context="{'default_user_id': id}">
+                        <list string="Department Assignments" 
+                              decoration-muted="not active"
+                              editable="bottom">
+                            <field name="department_id" options="{'no_create': True}"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="company_id" invisible="1"/>
+                        </list>
+                    </field>
+                    
+                    <div class="alert alert-info mt-3" role="alert" colspan="2">
+                        <strong>Time Off Officer Capabilities:</strong>
+                        <ul class="mb-0">
+                            <li>View and approve leave requests for assigned department trees ONLY</li>
+                            <li>View balance reports for assigned departments</li>
+                            <li>View all employees (limited to Resume and Work Information tabs)</li>
+                            <li>View public holidays (READ-ONLY - cannot create/edit/delete)</li>
+                            <li>Cannot approve their own leave requests</li>
+                        </ul>
+                        <p class="mt-2 mb-0"><strong>Note:</strong> Adding assignments below will automatically grant the "Officer: Manage Department Requests" group to this user. You can also assign via "Time Off (Extra)" dropdown in Access Rights tab.</p>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+    Hide sensitive tabs from Time Off Officers
+    Uses groups attribute in xpath instead of groups_id on record
+    -->
+    
+    <record id="view_employee_form_officer_restrictions" model="ir.ui.view">
+        <field name="name">hr.employee.form.officer.restrictions</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- Hide Private Information tab for officers (but not HR managers) -->
+            <xpath expr="//page[@name='personal_information']" position="attributes">
+                <attribute name="groups">!snifx_timeoff_officer_department.group_timeoff_officer_department</attribute>
+            </xpath>
+            
+            <!-- Hide HR Settings tab for officers (but not HR managers) -->
+            <xpath expr="//page[@name='hr_settings']" position="attributes">
+                <attribute name="groups">!snifx_timeoff_officer_department.group_timeoff_officer_department</attribute>
+            </xpath>
+            
+            <!-- Show info banner for officers only (not for HR managers) -->
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info mb-3" role="alert" 
+                     groups="snifx_timeoff_officer_department.group_timeoff_officer_department,!hr_holidays.group_hr_holidays_manager">
+                    <i class="fa fa-info-circle"/> <strong>Officer View:</strong> You can view Resume and Work Information tabs only.
+                </div>
+            </xpath>
+            
+        </field>
+    </record>
+    
+</odoo>

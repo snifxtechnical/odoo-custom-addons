@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add computed field first so it's available for button visibility -->
+    <record id="view_hr_leave_form_officer_info" model="ir.ui.view">
+        <field name="name">hr.leave.form.officer.info</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add invisible fields for permission check -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="can_approve_as_officer" invisible="1"/>
+                <field name="officer_activity_created" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Ensure Approve and Validate buttons are visible for authorized users only -->
+    <record id="view_hr_leave_form_officer_buttons" model="ir.ui.view">
+        <field name="name">hr.leave.form.officer.buttons</field>
+        <field name="model">hr.leave</field>
+        <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <!-- 
+            Make approve button visible ONLY for authorized groups:
+            - base.group_system (Administrator)
+            - hr_holidays.group_hr_holidays_manager (Time Off Manager)
+            - hr_holidays.group_hr_holidays_responsible (Time Off Responsible)
+            - snifx_timeoff_officer_department.group_timeoff_officer_department (Officer with Balance)
+            -->
+            <xpath expr="//button[@name='action_approve']" position="attributes">
+                <attribute name="groups">base.group_system,hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_responsible,snifx_timeoff_officer_department.group_timeoff_officer_department</attribute>
+                <attribute name="invisible">state not in ('confirm', 'validate1')</attribute>
+            </xpath>
+            
+            <!-- Make validate button visible ONLY for authorized groups -->
+            <xpath expr="//button[@name='action_validate']" position="attributes">
+                <attribute name="groups">base.group_system,hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_responsible,snifx_timeoff_officer_department.group_timeoff_officer_department</attribute>
+                <attribute name="invisible">state not in ('confirm', 'validate1')</attribute>
+            </xpath>
+            
+            <!-- Make refuse button visible ONLY for authorized groups -->
+            <xpath expr="//button[@name='action_refuse']" position="attributes">
+                <attribute name="groups">base.group_system,hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_responsible,snifx_timeoff_officer_department.group_timeoff_officer_department</attribute>
+                <attribute name="invisible">state not in ('confirm', 'validate1', 'validate', 'refuse')</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

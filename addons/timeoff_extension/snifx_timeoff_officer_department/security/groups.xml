@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_timeoff_officer_department" model="res.groups">
+        <field name="name">Officer: Manage Department Requests</field>
+        <!-- 
+        Group is functional without category_id.
+        Accessible via:
+        1. Time Off (Extra) dropdown field in Access Rights tab
+        2. Officer Assignments tab (auto-assignment)
+        
+        Not showing as checkbox prevents duplicate UI.
+        -->
+        <field name="comment"><![CDATA[
+Time Off Officer with department-based access control:
+- View and approve leave requests for assigned department trees ONLY
+- View balance reports for assigned departments
+- View all employees (limited to Resume and Work Information tabs)
+- View public holidays (READ-ONLY - cannot create/edit/delete)
+- Cannot approve their own leave requests
+- Flexible assignment to multiple department trees
+
+Note: This group uses custom permission checking instead of standard inheritance
+to maintain strict department-based access control via record rules.
+
+Public Holiday Management: 
+- Only Administrators and Managers can access Public Holidays management menu
+- Officers can see holidays in calendar/dashboard but cannot manage them
+
+Assignment: Use Settings > Users > [User] > Officer Assignments tab OR
+use the "Time Off (Extra)" dropdown in Access Rights tab to assign this group.
+        ]]></field>
+    </record>
+</odoo>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+    Public Holidays Management for Time Off Officers
+    Multiple approaches to ensure menu appears
+    -->
+    
+    <!-- Tree view for public holidays -->
+    <record id="view_resource_calendar_leaves_tree_officer" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.tree.officer</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="arch" type="xml">
+            <list string="Public Holidays">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Form view for public holidays -->
+    <record id="view_resource_calendar_leaves_form_officer" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.form.officer</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="arch" type="xml">
+            <form string="Public Holiday">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Calendar view for public holidays -->
+    <record id="view_resource_calendar_leaves_calendar_officer" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.calendar.officer</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="arch" type="xml">
+            <calendar string="Public Holidays" date_start="date_from" date_stop="date_to" color="name" mode="month">
+                <field name="name"/>
+            </calendar>
+        </field>
+    </record>
+    
+    <!-- Search view for public holidays -->
+    <record id="view_resource_calendar_leaves_search_officer" model="ir.ui.view">
+        <field name="name">resource.calendar.leaves.search.officer</field>
+        <field name="model">resource.calendar.leaves</field>
+        <field name="arch" type="xml">
+            <search string="Public Holidays">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter string="Current Year" name="current_year" 
+                        domain="[('date_from', '&gt;=', time.strftime('%%Y-01-01')), ('date_from', '&lt;=', time.strftime('%%Y-12-31'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action to manage public holidays -->
+    <record id="action_public_holidays_officer" model="ir.actions.act_window">
+        <field name="name">Public Holidays</field>
+        <field name="res_model">resource.calendar.leaves</field>
+        <field name="view_mode">list,form,calendar</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_resource_calendar_leaves_tree_officer')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_resource_calendar_leaves_form_officer')}),
+            (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_resource_calendar_leaves_calendar_officer')}),
+        ]"/>
+        <field name="search_view_id" ref="view_resource_calendar_leaves_search_officer"/>
+        <field name="domain">[('calendar_id', '=', False)]</field>
+        <field name="context">{
+            'default_calendar_id': False, 
+            'default_resource_id': False,
+            'search_default_current_year': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a Public Holiday
+            </p>
+            <p>
+                Public holidays are non-working days that apply to all employees.
+                They will be visible in employee calendars and dashboards.
+            </p>
+        </field>
+    </record>
+    
+    <!-- 
+    ==========================================================================
+    PUBLIC HOLIDAYS MENU - SINGLE CONFIGURATION
+    ==========================================================================
+    
+    CRITICAL: Only ONE Public Holidays menu should exist in the system.
+    
+    Strategy:
+    1. Delete the ORIGINAL Public Holidays menu (the one in dropdown, not Configuration)
+    2. Keep our single menu under Configuration
+    
+    ==========================================================================
+    -->
+    
+    <!-- 
+    Step 1: Delete the original Public Holidays menu
+    This is the menu that appears in Time Off Types dropdown (sequence=3)
+    We target it by action since it has a specific action
+    -->
+    <delete model="ir.ui.menu" search="[('name', '=', 'Public Holidays'), ('sequence', '=', 3)]"/>
+    
+    <!-- 
+    Step 2: Create single Public Holidays menu under Configuration
+    Using data tag with noupdate="1" to prevent recreation on upgrades
+    -->
+    <data noupdate="1">
+        <menuitem id="menu_public_holidays_config"
+                  name="Public Holidays"
+                  parent="hr_holidays.menu_hr_holidays_configuration"
+                  action="action_public_holidays_officer"
+                  sequence="45"
+                  groups="hr_holidays.group_hr_holidays_manager,base.group_system"/>
+    </data>
+              
+</odoo>
