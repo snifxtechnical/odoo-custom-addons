@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- 
+            SIMPLE APPROACH: Just modify the standard "Waiting For Me" filter
+            
+            RESULT:
+            - ONE filter only: "Waiting For Me"
+            - Shows: User-specific pending (for everyone)
+            - Auto-hide: Works after approve
+            
+            For admin overview: Use "To Approve" filter instead
+        -->
+        
+        <!-- Modify standard "Waiting For Me" filter -->
+        <record id="view_hr_leave_filter_modify_waiting" model="ir.ui.view">
+            <field name="name">hr.leave.filter.modify.waiting</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.view_hr_holidays_filter"/>
+            <field name="arch" type="xml">
+                <!-- Replace the original filter domain -->
+                <xpath expr="//filter[@name='waiting_for_me']" position="replace">
+                    <filter string="Waiting For Me" 
+                            name="waiting_for_me"
+                            domain="[('user_has_pending_approval', '=', True)]"
+                            help="Time off requests waiting for your approval (shows only your pending tasks)"/>
+                </xpath>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
