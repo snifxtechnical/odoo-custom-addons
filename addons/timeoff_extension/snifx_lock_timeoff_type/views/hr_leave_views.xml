@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit Time Off Form View -->
+        <record id="hr_leave_view_form_inherit_lock_type" model="ir.ui.view">
+            <field name="name">hr.leave.view.form.lock.type</field>
+            <field name="model">hr.leave</field>
+            <field name="inherit_id" ref="hr_holidays.hr_leave_view_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add placeholder text to time off type field -->
+                <xpath expr="//field[@name='holiday_status_id']" position="attributes">
+                    <attribute name="placeholder">Select time off type...</attribute>
+                    <attribute name="options">{'no_quick_create': True, 'no_create_edit': True}</attribute>
+                </xpath>
+                
+                <!-- No additional UI elements needed -->
+                <!-- Field is readonly (sufficient visual indicator) -->
+                <!-- Error message shows if user tries to change -->
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>
