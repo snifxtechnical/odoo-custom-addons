@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Approval Level List View -->
+    <record id="leave_approval_level_view_tree" model="ir.ui.view">
+      <field name="name">leave.approval.level.tree</field>
+      <field name="model">leave.approval.level</field>
+      <field name="arch" type="xml">
+        <list decoration-success="state=='approved'" 
+              decoration-danger="state=='rejected'" 
+              decoration-muted="state=='skipped'"
+              decoration-warning="is_overdue==True"
+              action="open_record">
+          <button name="open_record" type="object" string="View Request" 
+                  icon="fa-external-link" class="btn-link"
+                  title="Open full time off request"/>
+          <field name="leave_id"/>
+          <field name="employee_id"/>
+          <field name="level"/>
+          <field name="approver_id"/>
+          <field name="state"/>
+          <field name="is_current_level" column_invisible="1"/>
+          <field name="is_overdue" column_invisible="1"/>
+          <field name="action_date"/>
+          <field name="deadline"/>
+          <button name="action_approve" type="object" string="Approve" 
+                  icon="fa-check" class="btn-success"
+                  invisible="state != 'pending' or not is_current_level"/>
+          <button name="action_reject" type="object" string="Reject" 
+                  icon="fa-times" class="btn-danger"
+                  invisible="state != 'pending' or not is_current_level"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- Approval Level Form View -->
+    <record id="leave_approval_level_view_form" model="ir.ui.view">
+      <field name="name">leave.approval.level.form</field>
+      <field name="model">leave.approval.level</field>
+      <field name="arch" type="xml">
+        <form string="Approval Level">
+          <header>
+            <button name="action_approve" type="object" string="Approve" 
+                    class="btn-primary" 
+                    invisible="state != 'pending' or not is_current_level"/>
+            <button name="action_reject" type="object" string="Reject" 
+                    class="btn-danger" 
+                    invisible="state != 'pending' or not is_current_level"/>
+            <button name="action_skip" type="object" string="Skip Level" 
+                    class="btn-warning" 
+                    groups="hr_holidays.group_hr_holidays_manager"
+                    invisible="state != 'pending'"/>
+            <field name="state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+          </header>
+          <sheet>
+            <!-- Leave Request Information -->
+            <group string="Leave Request Details">
+              <group>
+                <field name="leave_type_id" readonly="1"/>
+                <field name="employee_id" readonly="1"/>
+                <field name="leave_date_from" readonly="1"/>
+                <field name="leave_date_to" readonly="1"/>
+              </group>
+              <group>
+                <field name="leave_description" readonly="1" widget="text" nolabel="1" placeholder="No description provided"/>
+              </group>
+            </group>
+            
+            <!-- Approval Information -->
+            <group string="Approval Information">
+              <group>
+                <field name="leave_id" readonly="1" string="Request Reference"/>
+                <field name="level" readonly="1"/>
+                <field name="is_current_level" invisible="1"/>
+                <field name="is_overdue" invisible="1"/>
+              </group>
+              <group>
+                <field name="approver_id" readonly="1"/>
+                <field name="approver_employee_id" readonly="1"/>
+                <field name="deadline"/>
+                <field name="action_date" readonly="1"/>
+              </group>
+            </group>
+
+            <group string="Delegation" invisible="not delegated_to_id">
+              <group>
+                <field name="original_approver_id" readonly="1"/>
+                <field name="delegated_to_id" readonly="1"/>
+              </group>
+            </group>
+
+            <group string="Comments">
+              <field name="comments" nolabel="1" placeholder="Add comments here..."/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- Approval Level Search View -->
+    <record id="leave_approval_level_view_search" model="ir.ui.view">
+      <field name="name">leave.approval.level.search</field>
+      <field name="model">leave.approval.level</field>
+      <field name="arch" type="xml">
+        <search string="Approval Levels">
+          <field name="leave_id"/>
+          <field name="employee_id"/>
+          <field name="approver_id"/>
+          
+          <filter name="my_approvals" string="My Approvals" 
+                  domain="[('approver_id', '=', uid)]"/>
+          <filter name="pending" string="Pending" 
+                  domain="[('state', '=', 'pending')]"/>
+          <filter name="current_level" string="Current Level" 
+                  domain="[('is_current_level', '=', True)]"/>
+          <filter name="overdue" string="Overdue" 
+                  domain="[('is_overdue', '=', True)]"/>
+          
+          <separator/>
+          <filter name="approved" string="Approved" 
+                  domain="[('state', '=', 'approved')]"/>
+          <filter name="rejected" string="Rejected" 
+                  domain="[('state', '=', 'rejected')]"/>
+          
+          <group expand="0" string="Group By">
+            <filter name="group_employee" string="Employee" 
+                    context="{'group_by': 'employee_id'}"/>
+            <filter name="group_approver" string="Approver" 
+                    context="{'group_by': 'approver_id'}"/>
+            <filter name="group_level" string="Level" 
+                    context="{'group_by': 'level'}"/>
+            <filter name="group_state" string="Status" 
+                    context="{'group_by': 'state'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Approval Level Action -->
+    <record id="leave_approval_level_action" model="ir.actions.act_window">
+      <field name="name">My Pending Approvals</field>
+      <field name="res_model">leave.approval.level</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('approver_id', '=', uid), ('state', '=', 'pending'), ('is_current_level', '=', True)]</field>
+      <field name="context">{'search_default_my_approvals': 1, 'search_default_pending': 1, 'search_default_current_level': 1}</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          No pending approvals
+        </p>
+        <p>
+          Leave requests that require your approval will appear here.
+        </p>
+      </field>
+    </record>
+
+    <!-- All Approval Levels Action (for HR) -->
+    <record id="leave_approval_level_action_all" model="ir.actions.act_window">
+      <field name="name">All Approval Levels</field>
+      <field name="res_model">leave.approval.level</field>
+      <field name="view_mode">list,form</field>
+      <field name="context">{}</field>
+    </record>
+
+    <!-- My Time Off Approvals Action (Shows hr.leave with auto-filter to current year) -->
+    <record id="hr_leave_action_my_approvals_filtered" model="ir.actions.act_window">
+      <field name="name">My Time Off Approvals</field>
+      <field name="res_model">hr.leave</field>
+      <field name="view_mode">list,form,kanban,calendar</field>
+      <field name="domain">[('user_has_pending_approval', '=', True)]</field>
+      <field name="context">{
+        'search_default_year': 1,
+      }</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          No pending time off approvals
+        </p>
+        <p>
+          Time off requests that require your approval will appear here.
+        </p>
+      </field>
+    </record>
+
+    <!-- v3.3.5 CHANGE: "Orgchart Waiting For Me" action removed -->
+    <!-- Use standard "Waiting For Me" filter with admin-aware module instead -->
+
+  </data>
+</odoo>

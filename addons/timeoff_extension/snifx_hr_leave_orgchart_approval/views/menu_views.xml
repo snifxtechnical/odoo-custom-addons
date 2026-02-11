@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Add menu: Time Off → My Time Off Approvals (with auto-filter) -->
+    <menuitem id="menu_hr_leave_my_approvals_filtered"
+              name="My Time Off Approvals"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="hr_leave_action_my_approvals_filtered"
+              sequence="5"
+              groups="base.group_user"/>
+
+    <!-- Add menu under Time Off → My Pending Approvals (detail view) -->
+    <menuitem id="menu_leave_my_approvals"
+              name="My Pending Approvals"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="leave_approval_level_action"
+              sequence="10"
+              groups="base.group_user"/>
+
+    <!-- Add menu under Time Off → Management → All Approvals (for HR) -->
+    <menuitem id="menu_leave_all_approvals"
+              name="All Approval Levels"
+              parent="hr_holidays.menu_hr_holidays_management"
+              action="leave_approval_level_action_all"
+              sequence="50"
+              groups="hr_holidays.group_hr_holidays_user"/>
+
+    <!-- v3.3.5 CHANGE: "Orgchart Waiting For Me" menu removed -->
+    <!-- Use standard "Waiting For Me" filter with admin-aware module instead -->
+    <!-- This eliminates redundant filter and menu -->
+
+  </data>
+</odoo>
